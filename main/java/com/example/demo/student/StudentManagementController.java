@@ -35,7 +35,7 @@ public class StudentManagementController {
 
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_ADMINTRAINEE')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_TRAINEE')")
     public List<Student> getAllStudents() {
         System.out.println("1");
         return getStudentList();
