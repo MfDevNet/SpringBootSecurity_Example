@@ -1,7 +1,11 @@
 package com.example.demo.security;
 
+import com.example.demo.auth.ApplicationUserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -23,9 +27,13 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
     private final PasswordEncoder passwordEncoder;
+    private final ApplicationUserService applicationUserService;
 
-    public ApplicationSecurityConfig(PasswordEncoder passwordEncoder) {
+    @Autowired
+    public ApplicationSecurityConfig(PasswordEncoder passwordEncoder
+            , ApplicationUserService applicationUserService) {
         this.passwordEncoder = passwordEncoder;
+        this.applicationUserService = applicationUserService;
     }
 
 
@@ -52,45 +60,31 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .rememberMe()
                 .tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(21))
-                .key("somthingverysecured")
+                .key("someThingVerySecured")
                 .rememberMeParameter("remember-me")
                 .and()
-        .logout()
-        .logoutUrl("/logout")
-        .clearAuthentication(true)
-        .invalidateHttpSession(true)
-        .deleteCookies("JSESSIONID","remember-me")
-        .logoutSuccessUrl("/login");
-
-
-
-        ;
+                .logout()
+                .logoutUrl("/logout")
+                .clearAuthentication(true)
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID", "remember-me")
+                .logoutSuccessUrl("/login");
     }
+
 
     @Override
-    @Bean
-    protected UserDetailsService userDetailsService() {
-        UserDetails studentUser = User.builder().username("student") // user
-                .password(passwordEncoder.encode("password")) // password
-//                .roles(STUDENT.name()) // ROLE_STUDENT
-                .authorities(STUDENT.getGrantedAuthorities())
-                .build();
-
-        UserDetails adminUser = User.builder().username("admin")
-                .password(passwordEncoder.encode("password"))
-//                .roles(ADMIN.name()) // ADMIN
-                .authorities(ADMIN.getGrantedAuthorities())
-                .build();
-        UserDetails traineeUser = User.builder().username("trainee")
-                .password(passwordEncoder.encode("password"))
-//                .roles(TRAINEE.name()) //ROLE_TRAINEE
-                .authorities(TRAINEE.getGrantedAuthorities())
-                .build();
-
-        return new InMemoryUserDetailsManager(
-                studentUser
-                , adminUser
-                , traineeUser
-        );
+    public void configure(AuthenticationManagerBuilder auth) {
+        auth.authenticationProvider(daoAuthenticationProvider());
     }
+
+
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setPasswordEncoder(passwordEncoder);
+        provider.setUserDetailsService(applicationUserService);
+        return provider;
+    }
+
+
 }
