@@ -1,6 +1,5 @@
 package com.example.demo.auth;
 
-import com.sun.javafx.scene.EnteredExitedHandler;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 

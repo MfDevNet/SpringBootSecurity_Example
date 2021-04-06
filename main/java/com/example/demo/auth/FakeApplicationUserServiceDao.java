@@ -8,6 +8,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+
+import static com.example.demo.security.ApplicationUserRole.*;
+
 @Repository("fake")
 public class FakeApplicationUserServiceDao implements ApplicationUserDao {
 
@@ -19,8 +22,6 @@ public class FakeApplicationUserServiceDao implements ApplicationUserDao {
     }
 
 
-
-
     @Override
     public Optional<ApplicationUser> selectApplicationUserByUserName(String userName) {
         return getApplicationUser().stream()
@@ -28,22 +29,22 @@ public class FakeApplicationUserServiceDao implements ApplicationUserDao {
                 .findFirst();
     }
 
-    private List<ApplicationUser> getApplicationUser(){
+    private List<ApplicationUser> getApplicationUser() {
         return Lists.newArrayList(
                 new ApplicationUser("admin",
                         passwordEncoder.encode("password"),
-                        ApplicationUserRole.ADMIN.getGrantedAuthorities(),
-                        true,true,true,true
+                        ADMIN.getGrantedAuthorities(),
+                        true, true, true, true
                 ),
                 new ApplicationUser("trainee",
                         passwordEncoder.encode("password"),
-                        ApplicationUserRole.TRAINEE.getGrantedAuthorities(),
-                        true,true,true,true
+                        TRAINEE.getGrantedAuthorities(),
+                        true, true, true, true
                 ),
                 new ApplicationUser("student",
                         passwordEncoder.encode("password"),
-                        ApplicationUserRole.STUDENT.getGrantedAuthorities(),
-                        true,true,true,true
+                        STUDENT.getGrantedAuthorities(),
+                        true, true, true, true
                 )
         );
     }
